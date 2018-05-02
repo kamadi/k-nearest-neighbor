@@ -24,25 +24,22 @@ class KNearestNeighbor:
                                  + ((arr['fe'] - row['fe']) ** 2))
             info_list.append([distance, int(row['class'])])
 
-        info_list.sort(key=lambda x: x[0], reverse=True)
-
-        # print(info_list[0])
-        # print(info_list[len(info_list) - 1])
+        info_list.sort(key=lambda x: x[0])
 
         part = info_list[:k]
 
-        result = [0] * 8
+        result = []
+
+        for i in range(0, 8):
+            result.append([i, 0])
 
         for item in part:
-            result[item[1]] = result[item[1]] + 1
+            result[item[1]][1] = result[item[1]][1] + 1
 
-        max_value = result[0]
-        max_index = 0
+        result.sort(key=lambda x: x[1], reverse=True)
 
-        for index, item in enumerate(result):
-            if item > max_value:
-                max_value = item
-                max_index = index
-
-        # print(max_index)
-        return max_index
+        if k > 1 and result[0][1] == result[1][1]:
+            for item in part:
+                if item[1] == result[0][1] or item[1] == result[1][1]:
+                    return item[1]
+        return result[0][0]

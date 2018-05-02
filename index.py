@@ -2,12 +2,13 @@ import pandas as pd
 
 from classifier import KNearestNeighbor
 
-data = pd.read_csv('glass.data.txt')
+data = pd.read_csv('glass.csv')
 
 
 def normalize(key):
     max_val = data[key].max()
-    data[key] = data[key].apply(lambda x: x / max_val)
+    min_val = data[key].min()
+    data[key] = data[key].apply(lambda x: (x - min_val) / (max_val - min_val))
 
 
 normalize('ri')
@@ -22,18 +23,22 @@ normalize('fe')
 
 values = data.values
 
-classfier = KNearestNeighbor(data)
+train = data[:150]
 
-test = {'ri': 1.51747, 'na': 12.84, 'mg': 3.50, 'al': 1.14, 'si': 73.27, 'k': 0.56, "ca": 8.55, 'ba': 0.00, 'fe': 0.00}
+test = data[150:]
 
-correct = 0
-incorrect = 0
+classfier = KNearestNeighbor(train)
 
-for index, row in data.iterrows():
-    result = classfier.predict(row.to_dict(), 5)
-    if result == int(row['class']):
-        correct += 1
-    else:
-        incorrect += 1
+for i in range(1, 11):
+    correct = 0
 
-print(correct,incorrect)
+    incorrect = 0
+
+    for index, row in test.iterrows():
+        result = classfier.predict(row.to_dict(), i)
+        if result == int(row['class']):
+            correct += 1
+        else:
+            incorrect += 1
+    accuracy = correct / (correct + incorrect)
+    print(i, accuracy)
